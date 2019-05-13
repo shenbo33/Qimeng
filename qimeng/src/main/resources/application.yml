@@ -1,0 +1,23 @@
+
+server:
+    port: 80
+    servlet:
+        session:
+            timeout: 60s
+
+spring:
+    datasource:
+        driver-class-name: com.mysql.jdbc.Driver
+        url: jdbc:mysql://192.168.150.210:3306/QM_DB?useUnicode=true&characterEncoding=utf-8&useSSL=true
+        username: root
+        password: 1q2w3e!@#
+    redis:
+        host: 192.168.150.210
+        port: 6379
+    session:
+        store-type: redis
+
+# 开启Mybatis下划线命名转驼峰命名
+mybatis:
+    configuration:
+        map-underscore-to-camel-case: true
