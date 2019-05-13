@@ -1,5 +1,7 @@
 package com.lions.body.security;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -21,14 +23,19 @@ import javax.servlet.http.HttpServletRequest;
  */
 @Component
 public class CustomAuthenticationProvider implements AuthenticationProvider {
+
+    private Logger logger = LoggerFactory.getLogger(CustomAuthenticationProvider.class);
+
     @Autowired
     private CustomUserDetailsService customUserDetailsService;
 
     @Override
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {
+        logger.info("进入实现AuthenticationProvider");
         // 获取用户输入的用户名和密码
         String inputName = authentication.getName();
         String inputPassword = authentication.getCredentials().toString();
+        logger.info("获取到的用户为：{},密码为：{}",inputName,inputPassword);
 
         CustomWebAuthenticationDetails details = (CustomWebAuthenticationDetails) authentication.getDetails();
 
@@ -44,8 +51,7 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
         if(!userDetails.getPassword().equals(inputPassword)) {
             throw new BadCredentialsException("密码错误");
         }
-
-        return new UsernamePasswordAuthenticationToken(inputName, inputPassword, userDetails.getAuthorities());
+        return new UsernamePasswordAuthenticationToken(userDetails, inputPassword, userDetails.getAuthorities());
     }
 
     private boolean validateVerify(String inputVerify) {
@@ -56,7 +62,7 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
         String validateCode = ((String) request.getSession().getAttribute("validateCode")).toLowerCase();
         inputVerify = inputVerify.toLowerCase();
 
-        System.out.println("验证码：" + validateCode + "用户输入：" + inputVerify);
+        logger.info("验证码：{},用户输入：{}",validateCode ,inputVerify);
 
         return validateCode.equals(inputVerify);
     }

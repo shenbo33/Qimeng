@@ -1,4 +1,4 @@
-package com.lions.body.security;
+package com.lions.body.servlet;
 
 /**
  * @author ：Shenbo
@@ -65,7 +65,7 @@ public class VerifyServlet extends HttpServlet {
      */
     char[] codeSequence = { 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J',
             'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W',
-            'X', 'Y', 'Z', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9' };
+            'X', 'Y', 'Z', '2', '3', '4', '5', '6', '7', '8', '9' };
 
     /**
      * 初始化验证图片属性

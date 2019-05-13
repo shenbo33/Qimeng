@@ -14,6 +14,7 @@ import java.util.List;
  */
 @Service
 public class SysUserRoleService {
+
     @Autowired
     private SysUserRoleMapper userRoleMapper;
 

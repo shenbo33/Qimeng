@@ -3,6 +3,8 @@ package com.lions.body.security;
 import com.lions.body.entity.SysPermission;
 import com.lions.body.service.SysPermissionService;
 import com.lions.body.service.SysRoleService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.PermissionEvaluator;
 import org.springframework.security.core.Authentication;
@@ -16,6 +18,9 @@ import java.util.List;
 
 @Component
 public class CustomPermissionEvaluator implements PermissionEvaluator {
+
+    private Logger logger = LoggerFactory.getLogger(CustomPermissionEvaluator.class);
+
     @Autowired
     private SysPermissionService permissionService;
     @Autowired
@@ -34,11 +39,13 @@ public class CustomPermissionEvaluator implements PermissionEvaluator {
             Integer roleId = roleService.selectByName(roleName).getId();
             // 得到角色所有的权限
             List<SysPermission> permissionList = permissionService.listByRoleId(roleId);
+            logger.info("用户：{},拥有角色:{}",user.getUsername(),roleName);
 
             // 遍历permissionList
             for(SysPermission sysPermission : permissionList) {
                 // 获取权限集
                 List permissions = sysPermission.getPermissions();
+                logger.info("用户：{},目标权限：{},拥有角色:{}",user.getUsername(),targetUrl+"/"+targetPermission,sysPermission.getPermission());
                 // 如果访问的Url和权限用户符合的话，返回true
                 if(targetUrl.equals(sysPermission.getUrl())
                         && permissions.contains(targetPermission)) {

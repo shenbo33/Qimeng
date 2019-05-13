@@ -13,11 +13,11 @@ public class SysPermission implements Serializable {
     static final long serialVersionUID = 1L;
 
     private Integer id;
-
+    // URL对应请求路径权限
     private String url;
-
+    // roleId关联角色
     private Integer roleId;
-
+    // 对应URL细分后的 put post get delete 请求方法
     private String permission;
 
     private List permissions;

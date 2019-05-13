@@ -10,6 +10,8 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.core.session.SessionRegistry;
+import org.springframework.security.core.session.SessionRegistryImpl;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.access.expression.DefaultWebSecurityExpressionHandler;
 import org.springframework.security.web.authentication.WebAuthenticationDetails;
@@ -46,7 +48,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         return tokenRepository;
     }
 
-
     /**
      * 注入自定义PermissionEvaluator
      */
@@ -56,7 +57,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         handler.setPermissionEvaluator(new CustomPermissionEvaluator());
         return handler;
     }
-
 
     @Autowired
     private AuthenticationDetailsSource<HttpServletRequest, WebAuthenticationDetails> authenticationDetailsSource;
@@ -80,31 +80,52 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         });
     }
 
+    @Autowired
+    private CustomAuthenticationSuccessHandler customAuthenticationSuccessHandler;
+    @Autowired
+    private CustomAuthenticationFailureHandler customAuthenticationFailureHandler;
+    @Autowired
+    private CustomLogoutSuccessHandler customLogoutSuccessHandler;
+
+    @Bean
+    public SessionRegistry sessionRegistry() {
+        return new SessionRegistryImpl();
+    }
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http.authorizeRequests()
             // 如果有允许匿名的url，填在下面
-            .antMatchers("/getVerifyCode").permitAll()
+            .antMatchers("/getVerifyCode","/login","/signout","/login/invalid").permitAll()
             .anyRequest().authenticated()
             .and()
             // 设置登陆页
             .formLogin().loginPage("/login")
-            // 设置登陆成功页
-            .defaultSuccessUrl("/").permitAll()
-            .failureUrl("/login/error")
-            .authenticationDetailsSource(authenticationDetailsSource)
             // 自定义登陆用户名和密码参数，默认为username和password
-//                .usernameParameter("username")
-//                .passwordParameter("password")
-            .and()
-            .logout().permitAll()
-            // 自动登录
-            .and().rememberMe()
-            .tokenRepository(persistentTokenRepository())
-            // 有效时间：单位s
-            .tokenValiditySeconds(60)
-            .userDetailsService(userDetailsService);
+            .usernameParameter("username")
+            .passwordParameter("password")
+            // 设置登陆成功页
+            .successHandler(customAuthenticationSuccessHandler)
+            .failureHandler(customAuthenticationFailureHandler)
+            .authenticationDetailsSource(authenticationDetailsSource)
+
+            .and().logout().logoutUrl("/signout") // 设置登出目录
+            .deleteCookies("JSESSIONID") // 登出时候删除客户端cookie"JSESSIONID"
+            .logoutSuccessHandler(customLogoutSuccessHandler) // 在自定义handler中进行处理
+
+            .and().rememberMe() // 自动登录
+            .tokenRepository(persistentTokenRepository()) // 配置自定义token处理
+            .tokenValiditySeconds(60) // 有效时间：单位s
+            .userDetailsService(userDetailsService).and()
+
+            .sessionManagement() // 对session有效时间进行管理
+            .invalidSessionUrl("/login/invalid") // session失效后跳转页面
+            .maximumSessions(1) // 最大登陆数
+            // 当达到最大值时，是否保留已经登录的用户
+            .maxSessionsPreventsLogin(false)
+            // 当达到最大值时，旧用户被踢出后的操作
+            .expiredSessionStrategy(new CustomExpiredSessionStrategy()) // 旧用户被踢出后处理方法
+            .sessionRegistry(sessionRegistry()); // 在线用户可踢出配置
 
         // 关闭CSRF跨域
         http.csrf().disable();
