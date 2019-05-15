@@ -1,13 +1,6 @@
 package com.lions.body.servlet;
 
-/**
- * @author ：Shenbo
- * @Description ：
- * @date ：Created in 2019/5/10 17:07
- */
-
 import javax.imageio.ImageIO;
-import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -46,11 +39,6 @@ public class VerifyServlet extends HttpServlet {
     private int fontHeight;
 
     /**
-     * 干扰线数量
-     */
-    private int interLine = 16;
-
-    /**
      * 第一个字符的x轴值，因为后面的字符坐标依次递增，所以它们的x轴值是codeX的倍数
      */
     private int codeX;
@@ -63,7 +51,7 @@ public class VerifyServlet extends HttpServlet {
     /**
      * codeSequence 表示字符允许出现的序列值
      */
-    char[] codeSequence = { 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J',
+    private char[] codeSequence = { 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J',
             'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W',
             'X', 'Y', 'Z', '2', '3', '4', '5', '6', '7', '8', '9' };
 
@@ -71,7 +59,7 @@ public class VerifyServlet extends HttpServlet {
      * 初始化验证图片属性
      */
     @Override
-    public void init() throws ServletException {
+    public void init() {
         // 从web.xml中获取初始信息
         // 宽度
         String strWidth = this.getInitParameter("width");
@@ -104,11 +92,10 @@ public class VerifyServlet extends HttpServlet {
     /**
      * @param request
      * @param response
-     * @throws ServletException
      * @throws java.io.IOException
      */
     @Override
-    protected void service(HttpServletRequest request, HttpServletResponse response) throws ServletException, java.io.IOException {
+    protected void service(HttpServletRequest request, HttpServletResponse response) throws java.io.IOException {
         // 定义图像buffer
         BufferedImage buffImg = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
         Graphics2D gd = buffImg.createGraphics();
@@ -126,6 +113,8 @@ public class VerifyServlet extends HttpServlet {
         gd.drawRect(0, 0, width - 1, height - 1);
         // 随机产生16条干扰线，使图象中的认证码不易被其它程序探测到。
         gd.setColor(Color.gray);
+        // 干扰线数量
+        int interLine = 16;
         for (int i = 0; i < interLine; i++) {
             int x = random.nextInt(width);
             int y = random.nextInt(height);
@@ -134,12 +123,12 @@ public class VerifyServlet extends HttpServlet {
             gd.drawLine(x, y, x + xl, y + yl);
         }
         // randomCode用于保存随机产生的验证码，以便用户登录后进行验证。
-        StringBuffer randomCode = new StringBuffer();
-        int red = 0, green = 0, blue = 0;
+        StringBuilder randomCode = new StringBuilder();
+        int red, green, blue;
         // 随机产生codeCount数字的验证码。
         for (int i = 0; i < codeCount; i++) {
             // 得到随机产生的验证码数字。
-            String strRand = String.valueOf(codeSequence[random.nextInt(36)]);
+            String strRand = String.valueOf(codeSequence[random.nextInt(32)]);
             // 产生随机的颜色分量来构造颜色值，这样输出的每位数字的颜色值都将不同。
             red = random.nextInt(255);
             green = random.nextInt(255);

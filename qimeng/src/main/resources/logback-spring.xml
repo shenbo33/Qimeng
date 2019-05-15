@@ -27,7 +27,7 @@
         <!--滚动策略：每天滚动生成-->
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
             <!--保存路径-->
-            <fileNamePattern>F:\01_Projects\09_Log\MicroShop\seller\log\info.%d.log</fileNamePattern>
+            <fileNamePattern>F:\01_Projects\09_Log\Qimeng\seller\log\info.%d.log</fileNamePattern>
         </rollingPolicy>
     </appender>
 
@@ -44,12 +44,15 @@
         <!--滚动策略-->
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
             <!--保存路径-->
-            <fileNamePattern>F:\01_Projects\09_Log\MicroShop\seller\log\error.%d.log</fileNamePattern>
+            <fileNamePattern>F:\01_Projects\09_Log\Qimeng\seller\log\error.%d.log</fileNamePattern>
         </rollingPolicy>
     </appender>
 
+    <logger name="org.springframework.scheduling">
+        <level value="info" />
+    </logger>
 
-    <root level="info">
+    <root level="info,debug">
         <!--控制台输出-->
         <appender-ref ref="consoleLog"/>
         <!--info输出-->

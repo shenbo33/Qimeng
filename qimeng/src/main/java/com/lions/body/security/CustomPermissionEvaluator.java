@@ -16,6 +16,11 @@ import java.io.Serializable;
 import java.util.Collection;
 import java.util.List;
 
+/**
+ * @author ：Shenbo
+ * @Description ：
+ * @date ：Created in 2019/5/15 9:41
+ */
 @Component
 public class CustomPermissionEvaluator implements PermissionEvaluator {
 
@@ -52,7 +57,6 @@ public class CustomPermissionEvaluator implements PermissionEvaluator {
                     return true;
                 }
             }
-
         }
 
         return false;

@@ -3,15 +3,15 @@ package com.lions.body.service;
 
 import com.lions.body.entity.SysPermission;
 import com.lions.body.mapper.SysPermissionMapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.Resource;
 import java.util.List;
 
 @Service
 public class SysPermissionService {
 
-    @Autowired
+    @Resource
     private SysPermissionMapper permissionMapper;
 
     /**

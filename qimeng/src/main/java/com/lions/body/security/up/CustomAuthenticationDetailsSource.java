@@ -1,6 +1,5 @@
-package com.lions.body.security;
+package com.lions.body.security.up;
 
-import com.lions.body.web.LoginController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.AuthenticationDetailsSource;

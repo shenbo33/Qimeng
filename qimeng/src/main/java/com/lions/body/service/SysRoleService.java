@@ -1,10 +1,10 @@
 package com.lions.body.service;
 
-import com.lions.body.entity.SysPermission;
-import com.lions.body.mapper.SysRoleMapper;
 import com.lions.body.entity.SysRole;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.lions.body.mapper.SysRoleMapper;
 import org.springframework.stereotype.Service;
+
+import javax.annotation.Resource;
 
 /**
  * @author ：Shenbo
@@ -14,7 +14,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class SysRoleService {
 
-    @Autowired
+    @Resource
     private SysRoleMapper roleMapper;
 
     public SysRole selectById(Integer id){

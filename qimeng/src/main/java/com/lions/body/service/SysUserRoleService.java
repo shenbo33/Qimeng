@@ -1,10 +1,10 @@
 package com.lions.body.service;
 
-import com.lions.body.mapper.SysUserRoleMapper;
 import com.lions.body.entity.SysUserRole;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.lions.body.mapper.SysUserRoleMapper;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.Resource;
 import java.util.List;
 
 /**
@@ -15,7 +15,7 @@ import java.util.List;
 @Service
 public class SysUserRoleService {
 
-    @Autowired
+    @Resource
     private SysUserRoleMapper userRoleMapper;
 
     public List<SysUserRole> listByUserId(Integer userId) {

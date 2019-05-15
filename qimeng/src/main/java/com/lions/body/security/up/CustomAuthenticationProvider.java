@@ -1,4 +1,4 @@
-package com.lions.body.security;
+package com.lions.body.security.up;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,6 +15,7 @@ import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.Objects;
 
 /**
  * @author ：Shenbo
@@ -26,11 +27,16 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
 
     private Logger logger = LoggerFactory.getLogger(CustomAuthenticationProvider.class);
 
+    private final CustomUserDetailsService customUserDetailsService;
+
     @Autowired
-    private CustomUserDetailsService customUserDetailsService;
+    public CustomAuthenticationProvider(CustomUserDetailsService customUserDetailsService) {
+        this.customUserDetailsService = customUserDetailsService;
+    }
 
     @Override
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {
+
         logger.info("进入实现AuthenticationProvider");
         // 获取用户输入的用户名和密码
         String inputName = authentication.getName();
@@ -56,7 +62,7 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
 
     private boolean validateVerify(String inputVerify) {
         //获取当前线程绑定的request对象
-        HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
+        HttpServletRequest request = ((ServletRequestAttributes) Objects.requireNonNull(RequestContextHolder.getRequestAttributes())).getRequest();
         // 不分区大小写
         // 这个validateCode是在servlet中存入session的名字
         String validateCode = ((String) request.getSession().getAttribute("validateCode")).toLowerCase();

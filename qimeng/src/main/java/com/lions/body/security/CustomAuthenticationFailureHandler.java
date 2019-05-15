@@ -21,14 +21,19 @@ import java.io.IOException;
  */
 @Component
 public class CustomAuthenticationFailureHandler implements AuthenticationFailureHandler {
-    @Autowired
-    private ObjectMapper objectMapper;
 
     private Logger logger = LoggerFactory.getLogger(getClass());
 
+    private final ObjectMapper objectMapper;
+
+    @Autowired
+    public CustomAuthenticationFailureHandler(ObjectMapper objectMapper) {
+        this.objectMapper = objectMapper;
+    }
+
     @Override
     public void onAuthenticationFailure(HttpServletRequest request,
-           HttpServletResponse response, AuthenticationException exception) throws IOException, ServletException {
+           HttpServletResponse response, AuthenticationException exception) throws IOException {
         logger.info("登陆失败");
         response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
         response.setContentType("application/json;charset=UTF-8");

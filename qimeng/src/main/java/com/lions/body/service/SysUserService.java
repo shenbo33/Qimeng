@@ -2,8 +2,9 @@ package com.lions.body.service;
 
 import com.lions.body.mapper.SysUserMapper;
 import com.lions.body.entity.SysUser;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import javax.annotation.Resource;
 
 /**
  * @author ：Shenbo
@@ -13,14 +14,14 @@ import org.springframework.stereotype.Service;
 @Service
 public class SysUserService {
 
-    @Autowired
+    @Resource
     private SysUserMapper userMapper;
-
-    public SysUser selectById(Integer id) {
-        return userMapper.selectById(id);
-    }
 
     public SysUser selectByName(String name) {
         return userMapper.selectByName(name);
+    }
+
+    public SysUser selectByMobile(String mobile) {
+        return userMapper.selectByMobile(mobile);
     }
 }

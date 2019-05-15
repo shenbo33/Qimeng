@@ -1,4 +1,4 @@
-package com.lions.body.security;
+package com.lions.body.security.up;
 
 
 import com.lions.body.entity.SysRole;
@@ -22,14 +22,18 @@ import java.util.List;
 
 @Service("userDetailsService")
 public class CustomUserDetailsService implements UserDetailsService {
-    @Autowired
-    private SysUserService userService;
+    private final SysUserService userService;
+
+    private final SysRoleService roleService;
+
+    private final SysUserRoleService userRoleService;
 
     @Autowired
-    private SysRoleService roleService;
-
-    @Autowired
-    private SysUserRoleService userRoleService;
+    public CustomUserDetailsService(SysUserService userService, SysRoleService roleService, SysUserRoleService userRoleService) {
+        this.userService = userService;
+        this.roleService = roleService;
+        this.userRoleService = userRoleService;
+    }
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {

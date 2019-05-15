@@ -1,5 +1,8 @@
 package com.lions.body.security;
 
+import com.lions.body.security.sms.SmsCodeAuthenticationSecurityConfig;
+import com.lions.body.security.up.CustomAuthenticationProvider;
+import com.lions.body.security.up.CustomUserDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -31,11 +34,21 @@ import javax.sql.DataSource;
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
-    @Autowired
-    private CustomUserDetailsService userDetailsService;
+    private final CustomUserDetailsService userDetailsService;
+
+    private final DataSource dataSource;
 
     @Autowired
-    private DataSource dataSource;
+    public WebSecurityConfig(CustomUserDetailsService userDetailsService, DataSource dataSource, AuthenticationDetailsSource<HttpServletRequest, WebAuthenticationDetails> authenticationDetailsSource, CustomAuthenticationProvider customAuthenticationProvider, CustomAuthenticationSuccessHandler customAuthenticationSuccessHandler, CustomAuthenticationFailureHandler customAuthenticationFailureHandler, CustomLogoutSuccessHandler customLogoutSuccessHandler, SmsCodeAuthenticationSecurityConfig smsCodeAuthenticationSecurityConfig) {
+        this.userDetailsService = userDetailsService;
+        this.dataSource = dataSource;
+        this.authenticationDetailsSource = authenticationDetailsSource;
+        this.customAuthenticationProvider = customAuthenticationProvider;
+        this.customAuthenticationSuccessHandler = customAuthenticationSuccessHandler;
+        this.customAuthenticationFailureHandler = customAuthenticationFailureHandler;
+        this.customLogoutSuccessHandler = customLogoutSuccessHandler;
+        this.smsCodeAuthenticationSecurityConfig = smsCodeAuthenticationSecurityConfig;
+    }
 
     @Bean
     public PersistentTokenRepository persistentTokenRepository(){
@@ -58,11 +71,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         return handler;
     }
 
-    @Autowired
-    private AuthenticationDetailsSource<HttpServletRequest, WebAuthenticationDetails> authenticationDetailsSource;
+    private final AuthenticationDetailsSource<HttpServletRequest, WebAuthenticationDetails> authenticationDetailsSource;
 
-    @Autowired
-    private CustomAuthenticationProvider customAuthenticationProvider;
+    private final CustomAuthenticationProvider customAuthenticationProvider;
 
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
@@ -80,23 +91,23 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         });
     }
 
-    @Autowired
-    private CustomAuthenticationSuccessHandler customAuthenticationSuccessHandler;
-    @Autowired
-    private CustomAuthenticationFailureHandler customAuthenticationFailureHandler;
-    @Autowired
-    private CustomLogoutSuccessHandler customLogoutSuccessHandler;
+    private final CustomAuthenticationSuccessHandler customAuthenticationSuccessHandler;
+    private final CustomAuthenticationFailureHandler customAuthenticationFailureHandler;
+    private final CustomLogoutSuccessHandler customLogoutSuccessHandler;
 
     @Bean
     public SessionRegistry sessionRegistry() {
         return new SessionRegistryImpl();
     }
 
+    private final SmsCodeAuthenticationSecurityConfig smsCodeAuthenticationSecurityConfig;
+
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        http.authorizeRequests()
+        http.apply(smsCodeAuthenticationSecurityConfig).and() // 加入手机验证
+            .authorizeRequests()
             // 如果有允许匿名的url，填在下面
-            .antMatchers("/getVerifyCode","/login","/signout","/login/invalid").permitAll()
+            .antMatchers("/getVerifyCode","/login","/signout","/login/invalid","/sms/**").permitAll()
             .anyRequest().authenticated()
             .and()
             // 设置登陆页
@@ -132,9 +143,11 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     }
 
     @Override
-    public void configure(WebSecurity web) throws Exception {
+    public void configure(WebSecurity web) {
         // 设置拦截忽略文件夹，可以对静态资源放行
         web.ignoring().antMatchers("/css/**", "/js/**");
     }
+
+
 }
 
